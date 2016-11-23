@@ -42,7 +42,14 @@
             </div>
         </div>
 
+        <iron-localstorage
+            name="overwatch-helper"
+            value="{{players}}"
+            on-iron-localstorage-load-empty="initializeDefaultValue"
+            ></iron-localstorage>
+
     </template>
+
     <script>
         Polymer({
             is: 'view-team-builder',
@@ -53,7 +60,15 @@
 
             ready: function () {
                 this.heroes = this.domHost.heroesWithNone;
-                this.players = [{ key: 'none' }, { key: 'none' },{ key: 'none' }, { key: 'none' },{ key: 'none' }, { key: 'none' }, { key: 'none' }, { key: 'none' },{ key: 'none' }, { key: 'none' },{ key: 'none' }, { key: 'none' }];
+                var _this = this;
+                // TODO: find a fix for this hack
+                setTimeout(function(){
+                    _this.updateCounters();
+                }, 1);
+            },
+
+            initializeDefaultValue: function () {
+                this.set('players', [{ key: 'none' }, { key: 'none' },{ key: 'none' }, { key: 'none' },{ key: 'none' }, { key: 'none' }, { key: 'none' }, { key: 'none' },{ key: 'none' }, { key: 'none' },{ key: 'none' }, { key: 'none' }]);
             },
 
             isNewLine: function (index) {
@@ -69,11 +84,9 @@
             _heroClicked: function (data) {
                 this.selectedHero = this.getHeroFromKey(data.detail.key);
                 this.set('players.' + this.slot + '.key', data.detail.key);
-                document.querySelector("ow-hero-select").hide();
                 this.updateCounters();
-                if (this.slot) {
-                    document.querySelector('ow-image#ow-image-' + this.slot).set('orange', false);
-                }
+                document.querySelector('ow-image#ow-image-' + this.slot).set('orange', false);
+                document.querySelector("ow-hero-select").hide();
                 this.slot = undefined;
             },
 
@@ -119,6 +132,7 @@
             },
 
             properties: {
+                slot: Number,
                 weaknesses: {
                     type: Array,
                     value: [],

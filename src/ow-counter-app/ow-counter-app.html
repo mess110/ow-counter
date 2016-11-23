@@ -12,6 +12,7 @@
 <link rel="import" href="../../bower_components/app-route/app-route.html">
 
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
 <link rel="import" href="../../bower_components/iron-input/iron-input.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
@@ -131,7 +132,7 @@
             // should probably read about fire and listeners in polymer
             _heroClickedProxy: function (data) {
                 var tb = document.querySelector("view-team-builder");
-                if (tb !== null && typeof tb._heroClicked === 'function') {
+                if (tb !== null && typeof tb._heroClicked === 'function' && this.page === 'team-builder') {
                     tb._heroClicked(data);
                 }
             },
