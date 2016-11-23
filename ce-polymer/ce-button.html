@@ -1,0 +1,56 @@
+<!--
+`ce-button`
+-->
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<dom-module id="ce-button">
+    <template>
+        <style>
+            :host {
+                margin-bottom: 15px;
+            }
+
+            span {
+                display: flex;
+                justify-content: center;
+                width: 100%;
+                text-transform: uppercase;
+                cursor: pointer;
+                border-radius: 5px;
+                padding: 15px 0px;
+                background-color: #ff9c00;
+                font-family: 'BigNoodleTitling', sans-serif;
+                font-size: 21px;
+            }
+
+            img {
+                height: 24px;
+            }
+        </style>
+        <span>
+            <template is="dom-if" if="{{loading}}">
+                <img src="{{image}}">
+            </template>
+            <template is="dom-if" if="{{!loading}}">
+                {{text}}
+            </template>
+        </span>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'ce-button',
+
+            properties: {
+                text: String,
+                loading: {
+                    type: Boolean,
+                    value: false
+                },
+                image: {
+                    type: String
+                }
+            }
+        });
+    </script>
+</dom-module>

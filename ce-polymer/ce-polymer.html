@@ -1,0 +1,34 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<!--
+`ce-polymer`
+
+
+@demo demo/index.html 
+-->
+
+<dom-module id="ce-polymer">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>Hello [[prop1]]</h2>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'ce-polymer',
+
+      properties: {
+        prop1: {
+          type: String,
+          value: 'ce-polymer',
+        },
+      },
+
+    });
+  </script>
+</dom-module>

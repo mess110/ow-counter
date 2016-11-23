@@ -1,0 +1,21 @@
+{
+  "name": "ow-counter",
+  "main": "index.html",
+  "dependencies": {
+    "app-layout": "PolymerElements/app-layout#^0.10.0",
+    "polymer": "Polymer/polymer#^1.4.0",
+    "neon-elements": "PolymerElements/neon-elements#^1.0.0",
+    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.3.1",
+    "app-route": "PolymerElements/app-route#^0.9.3",
+    "iron-pages": "PolymerElements/iron-pages#^1.0.8",
+    "iron-ajax": "PolymerElements/iron-ajax#^1.4.3",
+    "iron-input": "PolymerElements/iron-input#^1.0.10",
+    "iron-validator-behavior": "PolymerElements/iron-validator-behavior#^1.0.1"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
+    "web-component-tester": "^4.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
+  }
+}

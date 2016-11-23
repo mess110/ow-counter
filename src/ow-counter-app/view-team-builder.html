@@ -1,0 +1,131 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="view-team-builder">
+    <template>
+        <style>
+            :host {
+                display: block;
+                color: white;
+                padding: 10px 20px;
+            }
+
+            .team {
+                text-align: center;
+            }
+
+            p {
+                text-align: center;
+                font-family: 'BigNoodleTitling', sans-serif;
+                font-size: 18px;
+            }
+
+            .selected {
+                box-shadow: 0 0 10px #008800;
+            }
+        </style>
+
+        <div class="layout vertical">
+            <div class="flex">
+                <div class="team">
+                    <template is="dom-repeat" items="{{ players }}" as="player">
+                        <ow-image id="ow-image-{{index}}" slot="{{ index }}" key="{{ player.key }}"></ow-image>
+                        <template is="dom-if" if="{{ isNewLine(index) }}">
+                            <br />
+                        </template>
+                    </template>
+                </div>
+            </div>
+            <div class="flex">
+                <template is="dom-repeat" items="{{ weaknesses }}" as="weakness">
+                    <p>{{ weakness }}</p>
+                </template>
+            </div>
+        </div>
+
+    </template>
+    <script>
+        Polymer({
+            is: 'view-team-builder',
+
+            listeners: {
+                'slotClicked': '_slotClicked',
+            },
+
+            ready: function () {
+                this.heroes = this.domHost.heroesWithNone;
+                this.players = [{ key: 'none' }, { key: 'none' },{ key: 'none' }, { key: 'none' },{ key: 'none' }, { key: 'none' }, { key: 'none' }, { key: 'none' },{ key: 'none' }, { key: 'none' },{ key: 'none' }, { key: 'none' }];
+            },
+
+            isNewLine: function (index) {
+                return index === 5;
+            },
+
+            getHeroFromKey: function (key) {
+                return this.heroes.filter(function (v) {
+                    return v.key === key;
+                })[0];
+            },
+
+            _heroClicked: function (data) {
+                this.selectedHero = this.getHeroFromKey(data.detail.key);
+                this.set('players.' + this.slot + '.key', data.detail.key);
+                document.querySelector("ow-hero-select").hide();
+                this.updateCounters();
+                if (this.slot) {
+                    document.querySelector('ow-image#ow-image-' + this.slot).set('orange', false);
+                }
+                this.slot = undefined;
+            },
+
+            _slotClicked: function (data) {
+                if (this.slot !== undefined && this.slot !== null) {
+                    document.querySelector('ow-image#ow-image-' + this.slot).set('orange', false);
+                }
+                if (this.slot === data.detail.slot) {
+                    document.querySelector('ow-image#ow-image-' + this.slot).set('orange', false);
+                    document.querySelector("ow-hero-select").hide();
+                    this.slot = undefined;
+                } else {
+                    this.slot = data.detail.slot;
+                    document.querySelector('ow-image#ow-image-' + this.slot).set('orange', true);
+                    document.querySelector("ow-hero-select").show();
+                }
+            },
+
+            updateCounters: function () {
+                this.splice("weaknesses", 0, this.weaknesses.length)
+                for (var i = 0; i < this.players.length; i++) {
+                    var player = this.players[i];
+                    document.querySelector('ow-image#ow-image-' + i).set('red', false);
+                }
+                for (var i = 0; i < this.players.length; i++) {
+                    var player = this.players[i];
+                    if (player.key === 'none') {
+                        continue;
+                    }
+                    player = this.getHeroFromKey(player.key);
+                    for (var j = 0; j < 6; j++) {
+                        var enemy = i < 6 ? this.players[j + 6] : this.players[j];
+                        if (enemy.key === 'none') {
+                            continue;
+                        }
+                        if (player.weak_against.includes(enemy.key)) {
+                            document.querySelector('ow-image#ow-image-' + i).set('red', true);
+                            var s = player.name + " is weak against " + this.getHeroFromKey(enemy.key).name;
+                            this.push('weaknesses', s);
+                        }
+                    }
+                }
+            },
+
+            properties: {
+                weaknesses: {
+                    type: Array,
+                    value: [],
+                    notify: true,
+                    reflectToAttributes: true
+                }
+            }
+        });
+    </script>
+</dom-module>

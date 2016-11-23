@@ -1,0 +1,58 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="view-main-menu">
+    <template>
+        <style include="iron-flex iron-flex-alignment"></style>
+        <style>
+            :host {
+                color: white;
+                padding: 10px 20px;
+            }
+
+            .button-container {
+                max-width: 300px;
+                min-width: 300px;
+                margin-bottom: 15px;
+            }
+        </style>
+        <app-location route="{{route}}"></app-location>
+
+        <div class="layout vertical flex center">
+            <div class="button-container">
+                <ce-button text='team builder' on-tap="goToTeamBuilder"></ce-button>
+            </div>
+            <div class="button-container">
+                <ce-button text='counters' on-tap="goToCounters"></ce-button>
+            </div>
+            <div class="button-container">
+                <ce-button text='stats' on-tap="goToStats"></ce-button>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'view-main-menu',
+
+            goToCounters: function () {
+                this._resetAnimations();
+                this.set('route.path', '/counters');
+            },
+
+            goToTeamBuilder: function () {
+                this._resetAnimations();
+                this.set('route.path', '/team-builder');
+            },
+
+            goToStats: function () {
+                this._resetAnimations()
+                this.set('route.path', '/stats');
+            },
+
+            _resetAnimations: function () {
+                this.domHost.set('entryAnimation', 'slide-from-right-animation')
+                this.domHost.set('exitAnimation', 'slide-left-animation')
+            }
+        });
+    </script>
+</dom-module>

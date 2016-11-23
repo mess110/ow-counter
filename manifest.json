@@ -1,0 +1,6 @@
+{
+  "name": "ow-counter",
+  "short_name": "ow-counter",
+  "start_url": "/",
+  "display": "standalone"
+}

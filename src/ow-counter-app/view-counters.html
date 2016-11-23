@@ -1,0 +1,65 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="view-counters">
+    <template>
+        <style include="iron-flex"></style>
+        <style>
+            :host {
+                display: block;
+                color: white;
+                padding: 10px 20px;
+                text-align: center;
+            }
+
+            .row {
+                padding: 20px 0px;
+            }
+
+            .row:nth-child(odd) {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+
+            .align-right {
+                text-align: right;
+            }
+
+            .align-left {
+                text-align: left;
+            }
+
+            .main-hero {
+                text-align: center;
+            }
+        </style>
+
+        <div class="layout vertical">
+            <template is="dom-repeat" items="{{ heroes }}" as="hero">
+                <div class="row layout horizontal">
+                    <div class="flex align-right">
+                        <template is="dom-repeat" items="{{ hero.weak_against }}" as="weakAgainst">
+                            <ow-image key="{{ weakAgainst }}" red></ow-image>
+                        </template>
+                    </div>
+                    <div class="flex main-hero">
+                        <ow-image key="{{ hero.key }}" highlight orange></ow-image>
+                    </div>
+                    <div class="flex align-left">
+                        <template is="dom-repeat" items="{{ hero.strong_against }}" as="strongAgainst">
+                            <ow-image key="{{ strongAgainst }}" green></ow-image>
+                        </template>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'view-counters',
+
+            ready: function () {
+                this.heroes = this.domHost.heroes;
+            },
+        });
+    </script>
+</dom-module>

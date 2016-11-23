@@ -1,0 +1,302 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../../bower_components/app-layout/app-scroll-effects/effects/waterfall.html">
+<link rel="import" href="../../bower_components/app-layout/app-scroll-effects/effects/parallax-background.html">
+<link rel="import" href="../../bower_components/app-route/app-location.html">
+<link rel="import" href="../../bower_components/app-route/app-route.html">
+
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../bower_components/iron-input/iron-input.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="../../bower_components/neon-animation/animations/slide-from-left-animation.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/slide-from-right-animation.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/slide-right-animation.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/slide-left-animation.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/slide-up-animation.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/slide-from-top-animation.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/slide-down-animation.html">
+<link rel="import" href="../../bower_components/neon-animation/neon-animated-pages.html">
+
+<link rel="import" href="battle-tag-validator.html">
+<link rel="import" href="ow-image.html">
+<link rel="import" href="../../ce-polymer/ce-button.html">
+<link rel="import" href="ow-hero-select.html">
+
+<dom-module id="ow-counter-app">
+    <template>
+        <style include="iron-flex iron-flex-alignment"></style>
+        <style>
+            .logo-container {
+                text-align: center;
+                width: 100%;
+                height: 100%;
+            }
+
+            .logo {
+                height: 100%;
+            }
+
+            app-header {
+                background-color: #061929;
+            }
+
+            neon-animated-pages {
+                margin-top: 15px;
+            }
+        </style>
+
+        <app-location route="{{route}}"></app-location>
+        <app-route
+            route="{{route}}"
+            pattern="/:page"
+            data="{{routeData}}"
+            tail="{{subroute}}"></app-route>
+
+        <app-drawer-layout fullbleed force-narrow>
+            <app-header-layout has-scrolling-region>
+
+                <app-header condenses reveals effects="parallax-background">
+                    <app-toolbar>
+                        <div class="logo-container">
+                            <img class="logo" src="../imgs/logo.png" on-tap="goToMenu">
+                        </div>
+                    </app-toolbar>
+                </app-header>
+
+                <neon-animated-pages
+                    entry-animation="[[entryAnimation]]" exit-animation="[[exitAnimation]]"
+                    selected="[[page]]"
+                    attr-for-selected="name"
+                    fallback-selection="404"
+                    role="main">
+                    <view-main-menu name="main-menu"></view-main-menu>
+                    <view-counters name="counters"></view-counters>
+                    <view-team-builder name="team-builder"></view-team-builder>
+                    <view-stats name="stats"></view-stats>
+                    <view-404 name="404"></view-404>
+                </neon-animated-pages>
+                <ow-hero-select heroes="[[heroesWithNone]]"></ow-hero-select>
+            </app-header-layout>
+        </app-drawer-layout>
+
+    </template>
+    <script>
+        Polymer({
+
+            is: 'ow-counter-app',
+
+            observers: [
+                '_routePageChanged(routeData.page)'
+            ],
+
+            listeners: {
+                'heroClicked': '_heroClickedProxy'
+            },
+
+            _routePageChanged: function(page) {
+                this.page = page || 'main-menu';
+            },
+
+            // Load page import on demand. Show 404 page if fails
+            _pageChanged: function(page) {
+                var resolvedPageUrl = this.resolveUrl('view-' + page + '.html');
+                this.importHref(resolvedPageUrl, null, this._showPage404, true);
+            },
+
+            _showPage404: function() {
+                this.page = '404';
+            },
+
+            goToMenu: function () {
+                var heroSelect = document.querySelector("ow-hero-select")
+                if (heroSelect !== undefined && heroSelect !== null) {
+                    heroSelect.hide();
+                }
+                this.set('entryAnimation', 'slide-from-left-animation')
+                this.set('exitAnimation', 'slide-right-animation')
+                this.set('route.path', '/');
+            },
+
+            // TODO: find out why this is needed
+            // the fire event from ow-image is not cought by the listeners of view-team-builder
+            // so this hack is needed
+            // should probably read about fire and listeners in polymer
+            _heroClickedProxy: function (data) {
+                var tb = document.querySelector("view-team-builder");
+                if (tb !== null && typeof tb._heroClicked === 'function') {
+                    tb._heroClicked(data);
+                }
+            },
+
+            ready: function () {
+                this.heroes = [
+                    {
+                        name: 'Ana',
+                        key: 'ana',
+                        weak_against: ['genji', 'reaper', 'tracer'],
+                        strong_against: ['lucio', 'mercy', 'zenyatta']
+                    },
+                    {
+                        name: 'Bastion',
+                        key: 'bastion',
+                        weak_against: ['genji', 'tracer', 'widowmaker', 'hanzo', 'junkrat', 'pharah', 'reaper', 'symmetra'],
+                        strong_against: ['mercy', 'reinhardt', 'winston']
+                    },
+                    {
+                        name: 'D\'va',
+                        key: 'dva',
+                        weak_against: ['mei', 'symmetra', 'zenyatta', 'lucio', 'zarya'],
+                        strong_against: ['pharah', 'reinhardt', 'widowmaker', 'hanzo', 'roadhog']
+                    },
+                    {
+                        name: 'Genji',
+                        key: 'genji',
+                        weak_against: ['mei', 'zarya', 'winston'],
+                        strong_against: ['bastion', 'mercy', 'torbjorn', 'mccree', 'roadhog', 'soldier76', 'widowmaker']
+                    },
+                    {
+                        name: 'Hanzo',
+                        key: 'hanzo',
+                        weak_against: ['dva', 'tracer', 'widowmaker', 'winston'],
+                        strong_against: ['bastion', 'torbjorn', 'widowmaker', 'zenyatta']
+                    },
+                    {
+                        name: 'Junkrat',
+                        key: 'junkrat',
+                        weak_against: ['mccree', 'pharah', 'widowmaker'],
+                        strong_against: ['bastion', 'mei', 'torbjorn', 'reaper', 'symmetra']
+                    },
+                    {
+                        name: 'Lucio',
+                        key: 'lucio',
+                        weak_against: ['mei', 'mccree', 'pharah'],
+                        strong_against: ['dva', 'reaper', 'winston']
+                    },
+                    {
+                        name: 'McCree',
+                        key: 'mccree',
+                        weak_against: ['genji', 'reinhardt', 'widowmaker'],
+                        strong_against: ['reaper', 'tracer', 'winston', 'junkrat', 'lucio', 'mercy', 'pharah']
+                    },
+                    {
+                        name: 'Mei',
+                        key: 'mei',
+                        weak_against: ['junkrat', 'pharah', 'widowmaker', 'reaper'],
+                        strong_against: ['genji', 'winston', 'tracer', 'dva', 'lucio', 'soldier76']
+                    },
+                    {
+                        name: 'Mercy',
+                        key: 'mercy',
+                        weak_against: ['mccree', 'tracer', 'widowmaker', 'bastion', 'genji', 'soldier76'],
+                        strong_against: []
+                    },
+                    {
+                        name: 'Pharah',
+                        key: 'pharah',
+                        weak_against: ['mccree', 'roadhog', 'soldier76', 'dva'],
+                        strong_against: ['bastion', 'junkrat', 'mei', 'lucio', 'reaper', 'symmetra', 'zarya']
+                    },
+                    {
+                        name: 'Reaper',
+                        key: 'reaper',
+                        weak_against: ['junkrat', 'mccree', 'pharah', 'lucio'],
+                        strong_against: ['bastion', 'mei', 'winston', 'reinhardt', 'roadhog', 'zarya']
+                    },
+                    {
+                        name: 'Reinhardt',
+                        key: 'reinhardt',
+                        weak_against: ['reaper', 'roadhog', 'pharah', 'bastion', 'dva'],
+                        strong_against: ['soldier76', 'torbjorn', 'widowmaker', 'mccree']
+                    },
+                    {
+                        name: 'Roadhog',
+                        key: 'roadhog',
+                        weak_against: ['dva', 'genji', 'reaper', 'zenyatta'],
+                        strong_against: ['pharah', 'reinhardt', 'tracer', 'symmetra', 'zarya']
+                    },
+                    {
+                        name: 'Soldier76',
+                        key: 'soldier76',
+                        weak_against: ['genji', 'mei', 'tracer', 'reinhardt'],
+                        strong_against: ['mercy', 'pharah', 'torbjorn', 'tracer']
+                    },
+                    {
+                        name: 'Sombra',
+                        key: 'sombra',
+                        weak_against: ['mei', 'winston', 'dva'],
+                        strong_against: ['reinhardt', 'zarya', 'tracer']
+                    },
+                    {
+                        name: 'Symmetra',
+                        key: 'symmetra',
+                        weak_against: ['junkrat', 'pharah', 'roadhog'],
+                        strong_against: ['bastion', 'dva', 'reinhardt']
+                    },
+                    {
+                        name: 'Torbjorn',
+                        key: 'torbjorn',
+                        weak_against: ['junkrat', 'pharah', 'widowmaker'],
+                        strong_against: ['mercy', 'genji', 'lucio', 'zenyatta', 'tracer']
+                    },
+                    {
+                        name: 'Tracer',
+                        key: 'tracer',
+                        weak_against: ['mccree', 'mei', 'soldier76', 'roadhog'],
+                        strong_against: ['bastion', 'mercy', 'widowmaker', 'hanzo', 'soldier76', 'zenyatta']
+                    },
+                    {
+                        name: 'Widowmaker',
+                        key: 'widowmaker',
+                        weak_against: ['dva', 'genji', 'winston', 'hanzo', 'reinhardt', 'tracer'],
+                        strong_against: ['bastion', 'torbjorn', 'pharah', 'zenyatta', 'hanzo', 'junkrat', 'mccree', 'mei', 'mercy']
+                    },
+                    {
+                        name: 'Winston',
+                        key: 'winston',
+                        weak_against: ['mccree', 'mei', 'reaper', 'lucio', 'zarya', 'zenyatta', 'bastion'],
+                        strong_against: ['genji', 'hanzo', 'widowmaker']
+                    },
+                    {
+                        name: 'Zarya',
+                        key: 'zarya',
+                        weak_against: ['pharah', 'roadhog', 'reaper'],
+                        strong_against: ['dva', 'genji', 'winston']
+                    },
+                    {
+                        name: 'Zenyatta',
+                        key: 'zenyatta',
+                        weak_against: ['hanzo', 'tracer', 'widowmaker'],
+                        strong_against: ['dva', 'roadhog', 'winston']
+                    }
+                ];
+                this.heroesWithNone = [].concat(this.heroes).concat({key: 'none', weak_against: [], strong_against: []})
+            },
+
+            properties: {
+                entryAnimation: {
+                    type: String,
+                    value: 'slide-from-left-animation',
+                    reflectToAttribute: true
+                },
+                exitAnimation: {
+                    type: String,
+                    value: 'slide-left-animation',
+                    reflectToAttribute: true
+                },
+                page: {
+                    type: String,
+                    reflectToAttribute: true,
+                    observer: '_pageChanged'
+                },
+            },
+        });
+    </script>
+</dom-module>

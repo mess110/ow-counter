@@ -1,0 +1,169 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="view-stats">
+    <template>
+        <style include="iron-flex"></style>
+        <style>
+            :host {
+                display: block;
+                color: white;
+                padding: 10px 20px;
+            }
+
+            h1, input, span, div {
+                font-family: 'BigNoodleTitling', sans-serif;
+                font-size: 21px;
+            }
+
+            img {
+                padding: 15px;
+            }
+
+            h1 {
+                padding-left: 15px;
+                margin: 12px 0px;
+            }
+
+            .skewed {
+                width: 200px;
+                max-width: 200px;
+                background-color: white;
+                border-radius: 5px;
+                transform: skew(-15deg, 0);
+                text-align: center;
+                margin-right: 15px;
+            }
+
+            input:focus {
+                outline: none;
+            }
+
+            .skewed > input {
+                transform: skew(15deg, 0);
+                border-width: 0px;
+                text-align: center;
+                padding-top: 15px;
+                padding-bottom: 15px;
+            }
+
+            .button-container {
+                max-width: 100px;
+                min-width: 100px;
+                margin-bottom: 15px;
+            }
+
+            .results {
+                padding-top: 45px;
+            }
+        </style>
+
+        <battle-tag-validator></battle-tag-validator>
+        <iron-ajax
+            url="https://api.lootbox.eu/pc/eu/[[ validBattleTag ]]/profile"
+            params='{}'
+            handle-as="json"
+            on-response="_handleResponse"
+            on-error="_handleErrorResponse"
+            last-response="{{ajaxResponse}}"
+            debounce-duration="300"></iron-ajax>
+
+        <div class="layout vertical flex center">
+            <div class="layout horizontal" style="max-height: 54px;">
+                <div class="skewed">
+                    <input placeholder="BattleTag" is="iron-input" bind-value="{{battleTag}}" on-input="_onInput">
+                </div>
+                <div class="button-container">
+                    <ce-button text='{{ buttonText }}' on-tap="triggerRequest" loading="{{ showLoader }}" image="src/imgs/loading.gif"></ce-button>
+                </div>
+            </div>
+
+            <div class="results">
+                <template is="dom-if" if="{{showError}}">
+                    <div class="layout horizontal">
+                        {{ errorMessage }}
+                    </div>
+                </template>
+                <template is="dom-if" if="{{showResult}}">
+                    <div class="layout horizontal">
+                        <div class="flex">
+                            <img src="{{ ajaxResponse.data.avatar }}">
+                        </div>
+                        <div class="flex">
+                            <h1>{{ ajaxResponse.data.username }}</h1>
+                            <h1>Level {{ ajaxResponse.data.level }}</h1>
+                            <h1>{{ ajaxResponse.data.games.quick.wins }} games won</h1>
+                            <h1>{{ ajaxResponse.data.playtime.quick }} played</h1>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'view-stats',
+
+            triggerRequest: function () {
+                if (!this.valid) {
+                    return;
+                }
+                this.validBattleTag = new String(this.battleTag).toString().replace('#', '-');
+                document.querySelector('iron-ajax').generateRequest()
+                this.showLoader = true;
+            },
+
+            _handleErrorResponse: function (e) {
+                console.log('error');
+                if (e.eventPhase == 2) {
+                    this.errorMessage = 'Offline';
+                    this.showResult = false;
+                    this.showError = true;
+                    this.showLoader = false;
+                }
+                console.log(e);
+            },
+
+            _handleResponse: function (data) {
+                this.showLoader = false;
+                if (this.ajaxResponse.data) {
+                    this.showResult = true;
+                    this.showError = false;
+                } else {
+                    this.showResult = false;
+                    this.showError = true;
+                    this.errorMessage = this.ajaxResponse.error;
+                }
+            },
+
+            ready: function () {
+                this.heroes = this.domHost.heroes;
+            },
+
+            _onInput: function(event) {
+                this.valid = document.querySelector('battle-tag-validator').validate(event.target.value);
+                this.buttonText = this.valid ? 'find' : 'invalid';
+            },
+
+            properties: {
+                errorMessage: String,
+                valid: {
+                    type: Boolean,
+                    value: true
+                },
+                buttonText: {
+                    type: String,
+                    value: 'find',
+                },
+                battleTag: {
+                    type: String,
+                    value: 'citris#2148',
+                },
+                validBattleTag: {
+                    type: String,
+                    value: 'citris-2148',
+                }
+            }
+        });
+    </script>
+</dom-module>

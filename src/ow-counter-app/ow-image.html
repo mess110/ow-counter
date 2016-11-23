@@ -1,0 +1,122 @@
+<!--
+`ow-image`
+Image element for ow-counter
+-->
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="ow-image">
+    <template>
+        <style>
+            :host {
+            }
+
+            img {
+                width: 12%;
+                max-width: 112px;
+                min-width: 40px;
+                border-radius: 15px;
+                background: rgba(51,51,51,.9);
+                margin: 5px;
+            }
+
+            .highlight {
+                max-width: 135px;
+                min-width: 70px;
+            }
+
+            .red {
+                box-shadow: 0 0 10px #880000;
+                background: rgba(255,0,0,0.4);
+            }
+
+            .green {
+                box-shadow: 0 0 10px #008800;
+                background: rgba(0,255,0,0.4);
+            }
+
+            .orange {
+                background-color: #ff9c00;
+            }
+        </style>
+        <img class$="{{classSelected(red, green, orange, highlight)}}" src="src/imgs/icon-{{key}}.png" on-tap="click">
+    </template>
+
+    <script>
+        Polymer({
+            is: 'ow-image',
+
+            click: function () {
+                if (this.disabled === true) {
+                    return;
+                }
+                if (this.slot === undefined) {
+                    this.fire('heroClicked', { key: this.key });
+                } else {
+                    this.fire('slotClicked', { key: this.key, slot: this.slot });
+                }
+            },
+
+            classSelected: function (red, green, orange, highlight) {
+                klass = ''
+                if (red === true) {
+                    klass += ' red'
+                }
+                if (green === true) {
+                    klass += ' green'
+                }
+                if (orange === true) {
+                    klass += ' orange'
+                }
+                if (highlight === true) {
+                    klass += ' highlight'
+                }
+                return klass;
+            },
+
+            properties: {
+                red: {
+                    type: Boolean,
+                    value: false,
+                    notify: true,
+                    reflectToAttributes: true
+                },
+                green: {
+                    type: Boolean,
+                    value: false,
+                    notify: true,
+                    reflectToAttributes: true
+                },
+                orange: {
+                    type: Boolean,
+                    value: false,
+                    notify: true,
+                    reflectToAttributes: true
+                },
+                highlight: {
+                    type: Boolean,
+                    value: false,
+                    notify: true,
+                    reflectToAttributes: true
+                },
+                slot: {
+                    type: Number,
+                    value: undefined,
+                    notify: true,
+                    reflectToAttributes: true
+                },
+                disabled: {
+                    type: Boolean,
+                    value: false,
+                    notify: true,
+                    reflectToAttributes: true
+                },
+                key: {
+                    type: String,
+                    value: 'none',
+                    notify: true,
+                    reflectToAttributes: true
+                }
+            },
+        });
+    </script>
+</dom-module>
